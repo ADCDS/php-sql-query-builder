@@ -41,6 +41,11 @@ class Column implements QueryPartInterface
      */
     public function __construct($name, $table, $alias = '')
     {
+        if($name[0] == '.') {
+            $table = '';
+            $name = ltrim($name, '.');
+        }
+
         $this->setName($name);
         $this->setTable($table);
         $this->setAlias($alias);
