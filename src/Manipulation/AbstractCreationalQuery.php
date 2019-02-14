@@ -10,6 +10,8 @@
 
 namespace NilPortugues\Sql\QueryBuilder\Manipulation;
 
+use NilPortugues\Sql\QueryBuilder\Syntax\SQLFunction;
+
 /**
  * Class AbstractCreationalQuery.
  */
@@ -39,6 +41,20 @@ abstract class AbstractCreationalQuery extends AbstractBaseQuery
      * @return array
      */
     public function getValues()
+    {
+        $res = [];
+        //Filter out SQLFunctions
+        foreach ($this->values as $key=>$value){
+            if(!($value instanceof SQLFunction))
+                $res[$key] = $value;
+        }
+        return $res;
+    }
+
+    /**
+     * @return array
+     */
+    public function getValuesWithFunctions()
     {
         return $this->values;
     }

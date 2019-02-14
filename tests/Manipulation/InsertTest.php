@@ -11,6 +11,7 @@
 namespace NilPortugues\Tests\Sql\QueryBuilder\Manipulation;
 
 use NilPortugues\Sql\QueryBuilder\Manipulation\Insert;
+use NilPortugues\Sql\QueryBuilder\Syntax\SQLFunction;
 
 /**
  * Class InsertTest.
@@ -61,5 +62,20 @@ class InsertTest extends \PHPUnit_Framework_TestCase
         $columns = $this->query->getColumns();
 
         $this->assertInstanceOf('NilPortugues\Sql\QueryBuilder\Syntax\Column', $columns[0]);
+    }
+
+    public function testMysqlFunction(){
+        $values = ['id' => 1,
+            'created_at' => new SQLFunction("NOW", ""),
+            'updated_at' => new SQLFunction("NOW", ""),
+            'is_admin' => true
+        ];
+
+        $this->query->setValues($values);
+
+        unset($values['created_at']);
+        unset($values['updated_at']);
+        $valueGotten = $this->query->getValues();
+        $this->assertSame($values, $valueGotten);
     }
 }

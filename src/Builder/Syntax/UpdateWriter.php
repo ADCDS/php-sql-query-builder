@@ -28,7 +28,7 @@ class UpdateWriter extends AbstractBaseWriter
      */
     public function write(Update $update)
     {
-        $values = $update->getValues();
+        $values = $update->getValuesWithFunctions();
         if (empty($values)) {
             throw new QueryException('No values to update in Update query.');
         }
@@ -53,7 +53,7 @@ class UpdateWriter extends AbstractBaseWriter
     protected function writeUpdateValues(Update $update)
     {
         $assigns = [];
-        foreach ($update->getValues() as $column => $value) {
+        foreach ($update->getValuesWithFunctions() as $column => $value) {
             $newColumn = array($column);
             $column = $this->columnWriter->writeColumn(SyntaxFactory::createColumn($newColumn, $update->getTable()));
 

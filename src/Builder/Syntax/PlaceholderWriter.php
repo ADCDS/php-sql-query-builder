@@ -10,6 +10,8 @@
 
 namespace NilPortugues\Sql\QueryBuilder\Builder\Syntax;
 
+use NilPortugues\Sql\QueryBuilder\Syntax\SQLFunction;
+
 /**
  * Class PlaceholderWriter.
  */
@@ -51,6 +53,12 @@ class PlaceholderWriter
      */
     public function add($value)
     {
+        if($value instanceof SQLFunction) {//If it is a mysql function call, the function call is the key
+            $key = $value->getName() . '(' . $value->getValue() . ')';
+            $this->placeholders[$key] = null;
+            return $key;
+        }
+
         $placeholderKey = ':v'.$this->counter;
         $this->placeholders[$placeholderKey] = $this->setValidSqlValue($value);
 

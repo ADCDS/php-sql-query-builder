@@ -12,6 +12,7 @@ namespace NilPortugues\Tests\Sql\QueryBuilder\Builder;
 
 use NilPortugues\Sql\QueryBuilder\Builder\GenericBuilder;
 use NilPortugues\Sql\QueryBuilder\Manipulation\Select;
+use NilPortugues\Sql\QueryBuilder\Syntax\SQLFunction;
 
 class GenericBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -280,5 +281,32 @@ QUERY;
         $expected = $this->writer->write($query);
 
         $this->assertSame($expected, (string) $query);
+    }
+
+
+    /**
+     * @test
+     */
+    public function testMysqlFunction()
+    {
+        $table = 'user';
+        $values = ['id' => 1,
+            'created_at' => new SQLFunction("NOW", ""),
+            'updated_at' => new SQLFunction("NOW", ""),
+            'is_admin' => true
+        ];
+        $expected = <<<QUERY
+INSERT INTO user (
+    user.id, user.created_at, user.updated_at,
+    user.is_admin
+)
+VALUES
+    (:v1, NOW(), NOW(), :v2)
+
+QUERY;
+
+        $insert = $this->writer->insert($table, $values);
+        $writeFormatted = $this->writer->writeFormatted($insert);
+        $this->assertSame($expected, $writeFormatted);
     }
 }

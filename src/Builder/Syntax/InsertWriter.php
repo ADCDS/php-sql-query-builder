@@ -55,7 +55,7 @@ class InsertWriter
         }
 
         $columns = $this->writeQueryColumns($columns);
-        $values = $this->writeQueryValues($insert->getValues());
+        $values = $this->writeQueryValues($insert->getValuesWithFunctions());
         $table = $this->writer->writeTable($insert->getTable());
         $comment = AbstractBaseWriter::writeQueryComment($insert);
 
