@@ -43,7 +43,7 @@ class Insert extends AbstractCreationalQuery
 
     public function onDuplicateKeyUpdate($values)
     {
-        array_walk( $values, function($key, &$value){
+        array_walk( $values, function(&$value, $key){
             if(is_null($value))
                 $value = new SQLFunction('VALUES', $key);
         });
