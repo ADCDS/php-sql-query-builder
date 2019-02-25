@@ -54,7 +54,7 @@ class PlaceholderWriter
     public function add($value)
     {
         if($value instanceof SQLFunction) {//If it is a mysql function call, the function call is the key
-            $key = $value->getName() . '(' . $value->getValue() . ')';
+            $key = $value->__toString();
             $this->placeholders[$key] = null;
             return $key;
         }
