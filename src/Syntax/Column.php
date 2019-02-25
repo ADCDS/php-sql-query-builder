@@ -140,4 +140,17 @@ class Column implements QueryPartInterface
     {
         return $this->getName() == self::ALL;
     }
+
+    public function __toString()
+    {
+        $alias = $this->getTable()->getAlias();
+        $table = ($alias) ? $alias : $this->getTable()->getName();
+
+        $columnString = (empty($table)) ? '' : "{$table}.";
+        $columnString .= $this->getName();
+
+        return $columnString;
+    }
+
+
 }

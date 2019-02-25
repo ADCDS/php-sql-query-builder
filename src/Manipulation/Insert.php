@@ -44,8 +44,10 @@ class Insert extends AbstractCreationalQuery
     public function onDuplicateKeyUpdate($values)
     {
         array_walk( $values, function(&$value, $key){
-            if(is_null($value))
-                $value = new SQLFunction('VALUES', $key);
+            if(is_null($value)) {
+                $nameAndAlias = [$key, null];
+                $value = new SQLFunction('VALUES', SyntaxFactory::createColumn($nameAndAlias, $this->getTable()));
+            }
         });
 
         $this->onDuplicateKeyUpdateValues = new Update($this->table, $values);
