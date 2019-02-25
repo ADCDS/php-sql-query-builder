@@ -64,7 +64,7 @@ class InsertTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('NilPortugues\Sql\QueryBuilder\Syntax\Column', $columns[0]);
     }
 
-    public function testMysqlFunction(){
+    public function testSQLFunction(){
         $values = ['id' => 1,
             'created_at' => new SQLFunction("NOW", ""),
             'updated_at' => new SQLFunction("NOW", ""),
@@ -77,5 +77,26 @@ class InsertTest extends \PHPUnit_Framework_TestCase
         unset($values['updated_at']);
         $valueGotten = $this->query->getValues();
         $this->assertSame($values, $valueGotten);
+    }
+
+    public function testValuesOnDuplicateKeyUpdate(){
+        $values = ['id' => 1,
+            'created_at' => new SQLFunction("NOW", ""),
+            'updated_at' => new SQLFunction("NOW", ""),
+            'is_admin' => true
+        ];
+
+        $this->query->setValues($values);
+
+        $onDuplicateValues = ['updated_at' => new SQLFunction("NOW", "")];
+        $this->query->onDuplicateKeyUpdate($onDuplicateValues);
+
+        unset($values['created_at']);
+        unset($values['updated_at']);
+
+        $valueGotten = $this->query->getValues();
+        $onDuplicateValuesGotten = $this->query->getOnDuplicateKeyUpdateValues();
+        $this->assertSame($values, $valueGotten);
+        $this->assertSame($onDuplicateValues, $onDuplicateValuesGotten);
     }
 }

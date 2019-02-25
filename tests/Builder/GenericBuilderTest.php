@@ -11,6 +11,7 @@
 namespace NilPortugues\Tests\Sql\QueryBuilder\Builder;
 
 use NilPortugues\Sql\QueryBuilder\Builder\GenericBuilder;
+use NilPortugues\Sql\QueryBuilder\Manipulation\Insert;
 use NilPortugues\Sql\QueryBuilder\Manipulation\Select;
 use NilPortugues\Sql\QueryBuilder\Syntax\SQLFunction;
 
@@ -270,6 +271,7 @@ QUERY;
 
         $this->assertSame($expected, $query->getSql($formatted));
     }
+
     /**
      * @test
      */
@@ -280,7 +282,7 @@ QUERY;
 
         $expected = $this->writer->write($query);
 
-        $this->assertSame($expected, (string) $query);
+        $this->assertSame($expected, (string)$query);
     }
 
 
@@ -331,5 +333,41 @@ QUERY;
 
         $writeFormatted = $this->writer->writeFormatted($select);
         $this->assertSame($expected, $writeFormatted);
+    }
+
+    public function testValuesOnDuplicateKeyUpdate()
+    {
+        $insert = new Insert('user');
+
+        $values = ['id' => 1,
+            'created_at' => new SQLFunction("NOW", ""),
+            'updated_at' => new SQLFunction("NOW", ""),
+            'is_admin' => true
+        ];
+
+        $insert->setValues($values);
+
+        $onDuplicateValues = ['updated_at' => new SQLFunction("NOW", "")];
+        $insert->onDuplicateKeyUpdate($onDuplicateValues);
+        $query = $this->writer->writeFormatted($insert);
+        $expectedQuery = <<<QUERY
+INSERT INTO user (
+    user.id, user.created_at, user.updated_at,
+    user.is_admin
+)
+VALUES
+    (:v1, NOW(), NOW(), :v2) ON DUPLICATE KEY
+UPDATE
+    user.updated_at = NOW()
+
+QUERY;
+        $this->assertEquals($expectedQuery, $query);
+
+        $valueGotten = $insert->getValues();
+
+        unset($values['created_at']);
+        unset($values['updated_at']);
+        $this->assertSame($values, $valueGotten);
+
     }
 }

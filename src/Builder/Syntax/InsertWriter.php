@@ -30,6 +30,11 @@ class InsertWriter
     protected $columnWriter;
 
     /**
+     * @var UpdateWriter
+     */
+    protected $updateWriter;
+
+    /**
      * @param GenericBuilder    $writer
      * @param PlaceholderWriter $placeholder
      */
@@ -37,6 +42,7 @@ class InsertWriter
     {
         $this->writer = $writer;
         $this->columnWriter = WriterFactory::createColumnWriter($this->writer, $placeholder);
+        $this->updateWriter = WriterFactory::createUpdateWriter($this->writer, $placeholder);
     }
 
     /**
@@ -59,6 +65,11 @@ class InsertWriter
         $table = $this->writer->writeTable($insert->getTable());
         $comment = AbstractBaseWriter::writeQueryComment($insert);
 
+        $onDuplicate = $insert->getOnDuplicateKeyUpdateValues();
+        if(!empty($onDuplicate)){
+            $onDuplicateValues = $this->updateWriter->writeUpdateValues($onDuplicate);
+            return $comment."INSERT INTO {$table} ($columns) VALUES ($values) ON DUPLICATE KEY UPDATE " . $onDuplicateValues;
+        }
         return $comment."INSERT INTO {$table} ($columns) VALUES ($values)";
     }
 

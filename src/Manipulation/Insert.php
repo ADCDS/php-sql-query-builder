@@ -10,6 +10,7 @@
 
 namespace NilPortugues\Sql\QueryBuilder\Manipulation;
 
+use NilPortugues\Sql\QueryBuilder\Syntax\SQLFunction;
 use NilPortugues\Sql\QueryBuilder\Syntax\SyntaxFactory;
 
 /**
@@ -17,6 +18,11 @@ use NilPortugues\Sql\QueryBuilder\Syntax\SyntaxFactory;
  */
 class Insert extends AbstractCreationalQuery
 {
+    /**
+     * @var Update
+     */
+    private $onDuplicateKeyUpdateValues;
+
     /**
      * @return string
      */
@@ -34,4 +40,24 @@ class Insert extends AbstractCreationalQuery
 
         return SyntaxFactory::createColumns($columns, $this->getTable());
     }
+
+    public function onDuplicateKeyUpdate($values)
+    {
+        array_walk( $values, function($key, &$value){
+            if(is_null($value))
+                $value = new SQLFunction('VALUES', $key);
+        });
+
+        $this->onDuplicateKeyUpdateValues = new Update($this->table, $values);
+    }
+
+    /**
+     * @return Update
+     */
+    public function getOnDuplicateKeyUpdateValues()
+    {
+        return $this->onDuplicateKeyUpdateValues;
+    }
+
+
 }
