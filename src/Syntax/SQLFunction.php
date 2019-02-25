@@ -59,6 +59,9 @@ class SQLFunction
      */
     public function getValue()
     {
+        if($this->value instanceof SQLFunction){
+            return $this->value->__toString();
+        }
         return $this->value;
     }
 
@@ -86,5 +89,9 @@ class SQLFunction
         $this->alias = $alias;
     }
 
+    public function __toString()
+    {
+        return $this->getName() . '(' . $this->getValue() . ')';
+    }
 
 }

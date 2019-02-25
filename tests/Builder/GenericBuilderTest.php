@@ -287,7 +287,7 @@ QUERY;
     /**
      * @test
      */
-    public function testMysqlFunction()
+    public function testSQLFunction()
     {
         $table = 'user';
         $values = ['id' => 1,
@@ -307,6 +307,29 @@ QUERY;
 
         $insert = $this->writer->insert($table, $values);
         $writeFormatted = $this->writer->writeFormatted($insert);
+        $this->assertSame($expected, $writeFormatted);
+    }
+
+    /**
+     * @test
+     */
+    public function testFunctionOnWhereCondition()
+    {
+        $select = new Select('user');
+        $select->where()->equals('user_id', new SQLFunction("MAX", 'user_id'));
+        $expected = <<<QUERY
+SELECT
+    user.*
+FROM
+    user
+WHERE
+    (
+        user.user_id = MAX(user_id)
+    )
+
+QUERY;
+
+        $writeFormatted = $this->writer->writeFormatted($select);
         $this->assertSame($expected, $writeFormatted);
     }
 }

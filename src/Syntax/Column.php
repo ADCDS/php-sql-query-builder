@@ -35,17 +35,16 @@ class Column implements QueryPartInterface
     protected $alias;
 
     /**
+     * Column constructor.
+     *
      * @param string $name
      * @param string $table
      * @param string $alias
+     * @throws QueryException
+     *
      */
     public function __construct($name, $table, $alias = '')
     {
-        if($name[0] == '.') {
-            $table = '';
-            $name = ltrim($name, '.');
-        }
-
         $this->setName($name);
         $this->setTable($table);
         $this->setAlias($alias);
