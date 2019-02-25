@@ -53,10 +53,8 @@ class PlaceholderWriter
      */
     public function add($value)
     {
-        if($value instanceof SQLFunction) {//If it is a mysql function call, the function call is the key
-            $key = $value->__toString();
-            $this->placeholders[$key] = null;
-            return $key;
+        if($value instanceof SQLFunction) {//If it is a mysql function call, don't add it to placeholders
+            return $value->__toString();
         }
 
         $placeholderKey = ':v'.$this->counter;
