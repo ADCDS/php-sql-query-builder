@@ -370,4 +370,44 @@ QUERY;
         $this->assertSame($values, $valueGotten);
 
     }
+
+    public function testValuesOnDuplicateKeyUpdateWithNullAndMixedValues()
+    {
+        $insert = new Insert('user');
+
+        $values = ['id' => 1,
+            'created_at' => new SQLFunction("NOW", ""),
+            'updated_at' => new SQLFunction("NOW", ""),
+            'is_admin' => true,
+            'count' => 1
+        ];
+
+        $insert->setValues($values);
+
+        $onDuplicateValues = ['updated_at' => new SQLFunction("NOW", ""), 'is_admin' => null, 'count' => 100];
+        $insert->onDuplicateKeyUpdate($onDuplicateValues);
+        $query = $this->writer->writeFormatted($insert);
+        $expectedQuery = <<<QUERY
+INSERT INTO user (
+    user.id, user.created_at, user.updated_at,
+    user.is_admin
+)
+VALUES
+    (:v1, NOW(), NOW(), :v2, :v3) ON DUPLICATE KEY
+UPDATE
+    user.updated_at = NOW(),
+    user.is_admin =
+VALUES
+    (user.is_admin),
+    user.count = :v4
+
+QUERY;
+        $this->assertEquals($expectedQuery, $query);
+
+        $valueGotten = $this->writer->getValues();
+
+        unset($values['created_at']);
+        unset($values['updated_at']);
+        $this->assertSame($values, $valueGotten);
+    }
 }

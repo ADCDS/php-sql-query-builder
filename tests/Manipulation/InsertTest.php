@@ -95,7 +95,29 @@ class InsertTest extends \PHPUnit_Framework_TestCase
         unset($values['updated_at']);
 
         $valueGotten = $this->query->getValues();
-        $onDuplicateValuesGotten = $this->query->getOnDuplicateKeyUpdateValues();
+        $onDuplicateValuesGotten = $this->query->getOnDuplicateKeyUpdateValuesWithFunctions();
+        $this->assertSame($values, $valueGotten);
+        $this->assertSame($onDuplicateValues, $onDuplicateValuesGotten);
+    }
+
+    public function testValuesOnDuplicateKeyUpdateMixedValues(){
+        $values = ['id' => 1,
+            'created_at' => new SQLFunction("NOW", ""),
+            'updated_at' => new SQLFunction("NOW", ""),
+            'is_admin' => true,
+            'count' => 1
+        ];
+
+        $this->query->setValues($values);
+
+        $onDuplicateValues = ['updated_at' => new SQLFunction("NOW", ""), 'count' => -1];
+        $this->query->onDuplicateKeyUpdate($onDuplicateValues);
+
+        unset($values['created_at']);
+        unset($values['updated_at']);
+
+        $valueGotten = $this->query->getValues();
+        $onDuplicateValuesGotten = $this->query->getOnDuplicateKeyUpdateValuesWithFunctions();
         $this->assertSame($values, $valueGotten);
         $this->assertSame($onDuplicateValues, $onDuplicateValuesGotten);
     }
