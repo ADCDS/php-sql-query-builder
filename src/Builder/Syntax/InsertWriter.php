@@ -65,7 +65,7 @@ class InsertWriter
         $table = $this->writer->writeTable($insert->getTable());
         $comment = AbstractBaseWriter::writeQueryComment($insert);
 
-        $onDuplicate = $insert->getOnDuplicateKeyUpdateValues();
+        $onDuplicate = $insert->getOnDuplicateKeyUpdate();
         if(!empty($onDuplicate)){
             $onDuplicateValues = $this->updateWriter->writeUpdateValues($onDuplicate);
             return $comment."INSERT INTO {$table} ($columns) VALUES ($values) ON DUPLICATE KEY UPDATE " . $onDuplicateValues;

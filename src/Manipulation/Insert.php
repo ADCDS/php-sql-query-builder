@@ -56,9 +56,25 @@ class Insert extends AbstractCreationalQuery
     /**
      * @return Update
      */
-    public function getOnDuplicateKeyUpdateValues()
+    public function getOnDuplicateKeyUpdate()
     {
         return $this->onDuplicateKeyUpdateValues;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOnDuplicateKeyUpdateValues()
+    {
+        return $this->onDuplicateKeyUpdateValues->getValues();
+    }
+
+    /**
+     * @return array
+     */
+    public function getOnDuplicateKeyUpdateValuesWithFunctions()
+    {
+        return $this->onDuplicateKeyUpdateValues->getValuesWithFunctions();
     }
 
 
